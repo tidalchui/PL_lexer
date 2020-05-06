@@ -1,0 +1,47 @@
+名字				属性				值
+var				Var
+a				Id
+,				Dot
+b				Id
+,				Dot
+c				Id
+,				Dot
+d				Id
+,				Dot
+s				Id
+:				Mao
+integer				INTEGER
+;				Over
+begin				Start
+a				Id
+:=				VL
+整数				num				3
+;				Over
+b				Id
+:=				VL
+整数				num				23
+;				Over
+c				Id
+:=				VL
+浮点数				num				12.52
+;				Over
+d				Id
+:=				VL
+整数				num				255
+;				Over
+s				Id
+:=				VL
+a				Id
++				Add
+b				Id
++				Add
+c				Id
++				Add
+d				Id
+;				Over
+writeln				function
+(				Left
+s				Id
+)				Right
+;				Over
+end				End
