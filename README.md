@@ -10,10 +10,10 @@ a:=011;
 b:=23324242424242;
 c:=12.52;
 d:=00FF;
-e:="abcde\"\\FGhij
+e:="abcde\"\\
+FGhij
 opqr'st"
 s:=a+b+c+d;
 writeln(s);
 end.
 ```
-
