@@ -6,7 +6,7 @@ class ErrorType {
 	Integer line;
 	String key;
 	public ErrorType(String t , Integer l , String k) {
-		// TODO è‡ªåŠ¨ç”Ÿæˆçš„æ„é€ å‡½æ•°å­˜æ ¹
+		// TODO ×Ô¶¯Éú³ÉµÄ¹¹Ôìº¯Êı´æ¸ù
 		type=t;line=l;key=k;
 	}
 	@Override
@@ -15,17 +15,21 @@ class ErrorType {
 	}
 }
 
+
 public class ErrorWriter {
+
+
 	public static ArrayList<ErrorType> errorList = new ArrayList<>();
 	public static void addError( String t , Integer l , String k ) {
 		errorList.add(new ErrorType(t, l, k));
 	}
 	public static String getErrorString(int i) {
 		if(i > errorList.size())
-			return "å‚æ•°è¶Šç•Œ";
+			return "²ÎÊıÔ½½ç";
 		else {
 			ErrorType eType = errorList.get(i);
 			return eType.type+" line:"+eType.line+" key:"+eType.key;
 		}
 	}
+
 }

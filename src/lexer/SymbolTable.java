@@ -4,8 +4,10 @@ import java.util.ArrayList;
 
 public class SymbolTable {
 	public static ArrayList<SortCode> sortCodeList = new ArrayList<>();
-    public static ArrayList<WordItem> wordItemList = new ArrayList<>();//å·²åŒ¹é…é¡¹ç›®
+    public static ArrayList<WordItem> wordItemList = new ArrayList<>();//ÒÑÆ¥ÅäÏîÄ¿
 	public static void initLoadSortCodeList(){
+		sortCodeList.add(new SortCode("STRING", 99, "string"));
+		sortCodeList.add(new SortCode("STRING", 99, "string"));
 		sortCodeList.add(new SortCode("WRITELN", 100, "function"));
 		sortCodeList.add(new SortCode("BEGIN", 101, "Start"));
 		sortCodeList.add(new SortCode("END", 102, "End"));
@@ -37,10 +39,10 @@ public class SymbolTable {
 		sortCodeList.add(new SortCode(":=", 128, "VL"));
 		sortCodeList.add(new SortCode("(", 129, "Left"));
 		sortCodeList.add(new SortCode(")", 130, "Right"));
-		sortCodeList.add(new SortCode("æ ‡è¯†ç¬¦", 131, "Id"));
-		sortCodeList.add(new SortCode("æ•´æ•°", 132, "num"));
-		sortCodeList.add(new SortCode("å­—ç¬¦ä¸²", 133, "string"));
-		sortCodeList.add(new SortCode("æµ®ç‚¹æ•°", 134, "num"));
+		sortCodeList.add(new SortCode("±êÊ¶·û", 131, "Id"));
+		sortCodeList.add(new SortCode("ÕûÊı", 132, "num"));
+		sortCodeList.add(new SortCode("×Ö·û´®", 133, "string"));
+		sortCodeList.add(new SortCode("¸¡µãÊı", 134, "num"));
 	}
 	public static SortCode getSortCodeByEncode(Integer encode) {
 		for( int i=0 ; i < sortCodeList.size() ; i++ )

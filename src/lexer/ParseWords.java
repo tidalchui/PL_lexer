@@ -1,25 +1,26 @@
 package lexer;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 
 public class ParseWords { 
 	private BufferedReader reader;
 	private StringBuffer buffer;
 
-	private static boolean isNumber(char c){//æ˜¯å¦ä¸ºæ•°å­—
+	private static boolean isNumber(char c){//ÊÇ·ñÎªÊý×Ö
 		if (c >= '0' && c <= '9')
 			return true;
 		return false;
 	}
 
-	private static boolean isLetter(char c){//æ˜¯å¦ä¸ºå­—æ¯
+	private static boolean isLetter(char c){//ÊÇ·ñÎª×ÖÄ¸
 		if (((c >= 'A' && c <= 'Z' )||(c >= 'a' && c <= 'z'))|| c == '_')
 			return true;
 		return false;
 	}
  
-	private static Integer search(String key){//æœç´¢å…³é”®å­—æ‰€å¯¹åº”çš„ç¼–ç 
+	private static Integer search(String key){//ËÑË÷¹Ø¼ü×ÖËù¶ÔÓ¦µÄ±àÂë
 		String bigWord = key.toUpperCase();
 		for (SortCode sortCode : SymbolTable.sortCodeList){
 			if (sortCode.word.equals(bigWord)){
@@ -36,7 +37,7 @@ public class ParseWords {
 	}
 	private void isNotes(char key) throws IOException {
 		key = (char) reader.read();
-		if (key == '*'){//å¤šè¡Œæ³¨é‡Š /* */
+		if (key == '*'){//¶àÐÐ×¢ÊÍ /* */
 			while(true){
 				while((key = (char) reader.read()) != '*'){
 					if (key == '\n'){
@@ -49,9 +50,9 @@ public class ParseWords {
 					break;
 				}
 			}
-		}else if (key == '/'){//å•è¡Œæ³¨é‡Š //
+		}else if (key == '/'){//µ¥ÐÐ×¢ÊÍ //
 			while((key = (char) reader.read()) != '\r');
-		}else{//é™¤ /
+		}else{//³ý /
 			SymbolTable.wordItemList.add(new WordItem("/", search("/"), line));
 		}
 	}
@@ -69,41 +70,47 @@ public class ParseWords {
 					matched = matched + key;
 				else
 					return false;
-			}else
+			}else if(key == '\n') {
+				ErrorWriter.errorList.add(new ErrorType("×Ö·û´®¿çÐÐ", line, matched));
+				nextLine();
+				line++;
+				return true;
+			}
+			else
 				matched = matched + key;
 		}
-		SymbolTable.wordItemList.add(new WordItem(matched,133 , line));
+		SymbolTable.wordItemList.add(new WordItem(matched,search("×Ö·û´®") , line));
 		return true;
 	}
 	
-	private String transformation(String num , int op) {//è¿›åˆ¶è½¬æ¢å‡½æ•°
+	private String transformation(String num , int op) {//½øÖÆ×ª»»º¯Êý
 		String back = num;
 		try {
-			if (op == 8 || op == 2 || op == 16) {//å…«è¿›åˆ¶è½¬åè¿›åˆ¶
+			if (op == 8 || op == 2 || op == 16) {//°Ë½øÖÆ×ªÊ®½øÖÆ
 				back = Integer.valueOf(num,op).toString();
 			}else if(op != 10){
-				System.out.println("ä¸æ”¯æŒè¿›åˆ¶ç±»åž‹");
+				System.out.println("²»Ö§³Ö½øÖÆÀàÐÍ");
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
-			System.out.println("è¿›åˆ¶é”™è¯¯:line:"+line+" key:"+num+" è½¬"+op+"æ—¶å‡ºé”™");
-			ErrorWriter.addError("è½¬è¯‘é”™è¯¯"+" è½¬"+op+"æ—¶å‡ºé”™", line, ""+num);
+			System.out.println("½øÖÆ´íÎó:line:"+line+" key:"+num+" ×ª"+op+"Ê±³ö´í");
+			ErrorWriter.addError("×ªÒë´íÎó"+" ×ª"+op+"Ê±³ö´í", line, ""+num);
 		}
 		return back;
 	}
 	
-	private void rules() {//è§„åˆ™æè¿°
+	private void rules() {//¹æÔòÃèÊö
 		SymbolTable.initLoadSortCodeList();
 		char key = 0;
 		try {
 			key = (char) reader.read();
 			while(true){
-				if (key == '\uFFFF')//åˆ¤æ–­æ˜¯å¦è¯»å–æ–‡æ¡£ç»“æŸ
+				if (key == '\uFFFF')//ÅÐ¶ÏÊÇ·ñ¶ÁÈ¡ÎÄµµ½áÊø
 					break;
-				else if (key == '/'){//åˆ¤æ–­æ˜¯å¦ä¸º /  /* */  //
+				else if (key == '/'){//ÅÐ¶ÏÊÇ·ñÎª /  /* */  //
 					isNotes(key);
 				}
-				else if (key == ':'){//æ˜¯å¦ä¸º : æˆ–è€… :=
+				else if (key == ':'){//ÊÇ·ñÎª : »òÕß :=
 					key = (char) reader.read();
 					if (key == '='){
 						SymbolTable.wordItemList.add(new WordItem(":=", search(":="), line));
@@ -111,25 +118,25 @@ public class ParseWords {
 					}else{
 						SymbolTable.wordItemList.add(new WordItem(":", search(":"), line));
 					}
-				}else if (key == '\n'){//æ˜¯å¦ä¸º æ¢è¡Œ \n
+				}else if (key == '\n'){//ÊÇ·ñÎª »»ÐÐ \n
 					line ++;
 					key = (char) reader.read();
 				}
 				else if(key == '"'){
-					//è¯†åˆ«å­—ç¬¦ä¸²
+					//Ê¶±ð×Ö·û´®
 					if (!matchString()) {
-						System.out.println("è½¬è¯‘é”™è¯¯:line:"+line+" key:"+key);
-						ErrorWriter.addError("è½¬è¯‘é”™è¯¯", line, ""+key);
+						System.out.println("×ªÒë´íÎó:line:"+line+" key:"+key);
+						ErrorWriter.addError("×ªÒë´íÎó", line, ""+key);
 					}
 					key = (char) reader.read();
 				}
-				else if (key == '\r' || key == ' ' || key == '\t' || key == '.'){//è·³è¿‡tabã€ç©ºæ ¼
+				else if (key == '\r' || key == ' ' || key == '\t' || key == '.'){//Ìø¹ýtab¡¢¿Õ¸ñ
 					key = (char) reader.read();
-				}else if (key == '+' || key == '-' || key == '*' || key == ',' || key == ';' || key == '='|| key == '#' || key == '(' || key == ')'){//è¿ç®—ç¬¦
+				}else if (key == '+' || key == '-' || key == '*' || key == ',' || key == ';' || key == '='|| key == '#' || key == '(' || key == ')'){//ÔËËã·û
 					String word = key + "";
 					SymbolTable.wordItemList.add(new WordItem(word, search(word), line));
 					key = (char) reader.read();
-				}else if(key == '>' || key == '<' ){//å…³ç³»ç¬¦
+				}else if(key == '>' || key == '<' ){//¹ØÏµ·û
 					String word = ""+key;
 					key = (char) reader.read();
 					if (key == '=' || (word+key).equals("<>") ) {
@@ -139,7 +146,7 @@ public class ParseWords {
 					else
 						SymbolTable.wordItemList.add(new WordItem(word, search(word), line));
 				}
-				else if (isLetter(key)){//æ ‡è¯†ç¬¦åˆ¤æ–­
+				else if (isLetter(key)){//±êÊ¶·ûÅÐ¶Ï
 					buffer.append(key);
 					key = (char) reader.read();
 					while ( isLetter(key) || isNumber(key) ){
@@ -150,7 +157,7 @@ public class ParseWords {
 					if (encode != -1){
 						SymbolTable.wordItemList.add(new WordItem(buffer.toString(), encode, line));
 					}else{
-						SymbolTable.wordItemList.add(new WordItem(buffer.toString(), search("æ ‡è¯†ç¬¦"), line));
+						SymbolTable.wordItemList.add(new WordItem(buffer.toString(), search("±êÊ¶·û"), line));
 					}
 					buffer.setLength(0);
 				}
@@ -164,7 +171,7 @@ public class ParseWords {
 						buffer.append(key);
 						key = (char) reader.read();
 					}
-					if (x == 0 ) {//æ•´æ•°
+					if (x == 0 ) {//ÕûÊý
 						String num = buffer.toString();
 						if(num.length() > 2){
 							int binary = 2; 
@@ -174,7 +181,7 @@ public class ParseWords {
 									binary = 16;
 								else if( op.equals("00") ) {
 									num = num.substring(2);
-									for(int i=0 ; i < num.length() ;i++) {//è‡ªé€‚åº”åˆ¤æ–­
+									for(int i=0 ; i < num.length() ;i++) {//×ÔÊÊÓ¦ÅÐ¶Ï
 										if( num.charAt(i) > '1' )
 											binary = 8;
 										if(num.charAt(i) > '7')
@@ -191,24 +198,24 @@ public class ParseWords {
 						}
 						long number = Long.parseLong(num);
 						if (number >= Integer.MIN_VALUE && number <= Integer.MAX_VALUE){
-							SymbolTable.wordItemList.add(new WordItem(num, search("æ•´æ•°"), line));
+							SymbolTable.wordItemList.add(new WordItem(num, search("ÕûÊý"), line));
 						}else {
-							System.out.println("æ•°å­—å¤ªå¤§è¶Šç•Œ:line:"+line+" number:"+buffer.toString());
-							ErrorWriter.addError("æ•°å­—å¤ªå¤§è¶Šç•Œ", line, ""+buffer.toString());
+							//System.out.println("Êý×ÖÌ«´óÔ½½ç:line:"+line+" number:"+buffer.toString());
+							ErrorWriter.addError("Êý×ÖÌ«´óÔ½½ç", line, ""+buffer.toString());
 						}
 						buffer.setLength(0);
-					}else if(x == 1){//æµ®ç‚¹æ•°
-						SymbolTable.wordItemList.add(new WordItem(buffer.toString(), search("æµ®ç‚¹æ•°"), line));
+					}else if(x == 1){//¸¡µãÊý
+						SymbolTable.wordItemList.add(new WordItem(buffer.toString(), search("¸¡µãÊý"), line));
 						buffer.setLength(0);
 					}else {
-						System.out.println("å°æ•°ç‚¹é”™è¯¯:line:"+line+" number:"+buffer.toString());
-						ErrorWriter.addError("å°æ•°ç‚¹é”™è¯¯", line, ""+buffer.toString());
+						System.out.println("Ð¡Êýµã´íÎó:line:"+line+" number:"+buffer.toString());
+						ErrorWriter.addError("Ð¡Êýµã´íÎó", line, ""+buffer.toString());
 		                buffer.setLength(0);
 						key = nextLine();
 					}
 				}else{
-					System.out.println("éžæ³•å­—ç¬¦:line:"+line+" key:"+key);
-					ErrorWriter.addError("éžæ³•å­—ç¬¦", line, ""+key);
+					System.out.println("·Ç·¨×Ö·û:line:"+line+" key:"+key);
+					ErrorWriter.addError("·Ç·¨×Ö·û", line, ""+key);
 					key = nextLine();
 	            }
 			}
@@ -262,11 +269,12 @@ public class ParseWords {
 		fw.close();
 	}
 	private void outputSymbolTable() throws IOException {
-		FileWriter fw = null;
+		//FileWriter fw = null;
 		File output=new File("./PascalCode/SymbolTable.txt");
-		fw = new FileWriter(output, false);
+		BufferedWriter fw = new BufferedWriter (new OutputStreamWriter (new FileOutputStream (output,true), StandardCharsets.UTF_8));
+		//fw = new FileWriter(output, false);
 		PrintWriter pw = new PrintWriter(fw);
-		pw.println("åå­—\t\t\t\t"+"å±žæ€§\t\t\t\t"+"å€¼");
+		pw.println("Ãû×Ö\t\t\t\t"+"ÊôÐÔ\t\t\t\t"+"Öµ");
 		pw.flush();
 		for(int i = 0 ; i < SymbolTable.wordItemList.size() ; i++) {
 			WordItem wordItem = SymbolTable.wordItemList.get(i);
@@ -286,5 +294,16 @@ public class ParseWords {
 		reader.close();
 		outputFile();
 		outputSymbolTable();
+	}
+
+	public Object doWorkByStr(String str) throws IOException {
+		reader = new BufferedReader(new StringReader(str));
+		buffer = new StringBuffer();
+		line = 1;
+		rules();
+		reader.close();
+		//outputFile();
+		//outputSymbolTable();
+		return SymbolTable.wordItemList;
 	}
 }

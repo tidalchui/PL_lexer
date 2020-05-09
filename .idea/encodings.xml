@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/src/lexer/ErrorWriter.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/lexer/ParseWords.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/lexer/SortCode.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/lexer/SymbolTable.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/lexer/WordItem.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/lexer/entry.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/ui/MainFrame.java" charset="GBK" />
+  </component>
+</project>

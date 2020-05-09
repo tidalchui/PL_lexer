@@ -1,9 +1,9 @@
 package lexer;
 
-class SortCode{
-	final String word;//å•è¯
-	final Integer encode;//ç¼–ç 
-	final String symbol;//æ³¨è®°ç¬¦
+public class SortCode{
+	public final String word;//µ¥´Ê
+	public final Integer encode;//±àÂë
+	public final String symbol;//×¢¼Ç·û
 	public SortCode(String word, Integer encode, String symbol){
 		this.word = word;
 		this.encode = encode;

@@ -1,9 +1,9 @@
 package lexer;
 
-class WordItem{
-	String key;//å…³é”®è¯
-	Integer encode;//ç¼–ç 
-	Integer line;//è¡Œå·
+public class WordItem{
+	public String key;//¹Ø¼ü´Ê
+	public Integer encode;//±àÂë
+	public Integer line;//ĞĞºÅ
 	public WordItem(String key, Integer encode, Integer line){
 		this.key = key;
 		this.encode = encode;
