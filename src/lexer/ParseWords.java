@@ -83,18 +83,24 @@ public class ParseWords {
 		return true;
 	}
 	
-	private String transformation(String num , int op) {//进制转换函数
+	private String transformation(String num , int op) throws IOException {//进制转换函数
 		String back = num;
 		try {
-			if (op == 8 || op == 2 || op == 16) {//八进制转十进制
+			if (op == 8 || op == 2) {//八进制转十进制
 				back = Integer.valueOf(num,op).toString();
-			}else if(op != 10){
+			}else if (op == 16) {
+				back = Integer.valueOf(num,op).toString();
+			}
+			else if(op != 10){
 				System.out.println("不支持进制类型");
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
-			System.out.println("进制错误:line:"+line+" key:"+num+" 转"+op+"时出错");
-			ErrorWriter.addError("转译错误"+" 转"+op+"时出错", line, ""+num);
+			nextLine();
+			buffer.setLength(0);
+			ErrorWriter.addError("进制转换错误"+" 转"+op+"进制时出错", line, ""+num);
+			line++;
+			return "";
 		}
 		return back;
 	}
@@ -125,7 +131,6 @@ public class ParseWords {
 				else if(key == '"'){
 					//识别字符串
 					if (!matchString()) {
-						System.out.println("转译错误:line:"+line+" key:"+key);
 						ErrorWriter.addError("转译错误", line, ""+key);
 					}
 					key = (char) reader.read();
@@ -165,7 +170,7 @@ public class ParseWords {
 					buffer.append(key);
 					key = (char) reader.read();
 					int x = 0;
-					while ( (isNumber(key)) || key == '.' || ( key <= 'F' && key >= 'A' ) || ( key <= 'f' && key >= 'a' ) ){
+					while ( (isNumber(key)) || key == '.' || ( key <= 'F' && key >= 'A' ) || ( key <= 'f' && key >= 'a' ) || key == 'x' ||key == 'X' ){
 						if(key == '.')
 							x++;
 						buffer.append(key);
@@ -173,13 +178,14 @@ public class ParseWords {
 					}
 					if (x == 0 ) {//整数
 						String num = buffer.toString();
-						if(num.length() > 2){
+						if(num.length() >= 2){
 							int binary = 2; 
 							String op = num.substring(0, 2);
 							if(op.charAt(0) == '0') {
-								if( op.equals("0x") || op.equals("0X") )
+								if( op.equals("0x") || op.equals("0X") ) {
+									num = num.substring(2);
 									binary = 16;
-								else if( op.equals("00") ) {
+								}else if( op.equals("00") ) {
 									num = num.substring(2);
 									for(int i=0 ; i < num.length() ;i++) {//自适应判断
 										if( num.charAt(i) > '1' )
@@ -192,15 +198,32 @@ public class ParseWords {
 											break;
 										}
 									}
+								}else {
+									binary = 8;
 								}
 								num = transformation(num, binary);
 							}
 						}
-						long number = Long.parseLong(num);
+						long number = 0;
+						try {
+							if (!num.equals(""))
+								number = Long.parseLong(num);
+							else {
+								line--;
+								number = Long.parseLong("A");
+							}
+						} catch (Exception e) {
+							// TODO: handle exception
+							ErrorWriter.errorList.add(new ErrorType("数字格式错误", line,"num"));
+							nextLine();
+							line++;
+							buffer.setLength(0);
+							key = (char) reader.read();
+							continue;
+						}
 						if (number >= Integer.MIN_VALUE && number <= Integer.MAX_VALUE){
 							SymbolTable.wordItemList.add(new WordItem(num, search("整数"), line));
 						}else {
-							//System.out.println("数字太大越界:line:"+line+" number:"+buffer.toString());
 							ErrorWriter.addError("数字太大越界", line, ""+buffer.toString());
 						}
 						buffer.setLength(0);
@@ -208,13 +231,13 @@ public class ParseWords {
 						SymbolTable.wordItemList.add(new WordItem(buffer.toString(), search("浮点数"), line));
 						buffer.setLength(0);
 					}else {
-						System.out.println("小数点错误:line:"+line+" number:"+buffer.toString());
+						//System.out.println("小数点错误:line:"+line+" number:"+buffer.toString());
 						ErrorWriter.addError("小数点错误", line, ""+buffer.toString());
 		                buffer.setLength(0);
 						key = nextLine();
 					}
 				}else{
-					System.out.println("非法字符:line:"+line+" key:"+key);
+					//System.out.println("非法字符:line:"+line+" key:"+key);
 					ErrorWriter.addError("非法字符", line, ""+key);
 					key = nextLine();
 	            }
@@ -252,11 +275,11 @@ public class ParseWords {
 				pw.println(lineOut);
 				lineOut = "";
 				pw.flush();
-				System.out.println();
+				//System.out.println();
 				line = wordItem.line;
 			}
 			lineOut = lineOut + wordItem;
-			System.out.print(wordItem);
+			//System.out.print(wordItem);
 		}
 		pw.println(lineOut);
 		pw.flush();
@@ -269,10 +292,8 @@ public class ParseWords {
 		fw.close();
 	}
 	private void outputSymbolTable() throws IOException {
-		//FileWriter fw = null;
 		File output=new File("./PascalCode/SymbolTable.txt");
 		BufferedWriter fw = new BufferedWriter (new OutputStreamWriter (new FileOutputStream (output,true), StandardCharsets.UTF_8));
-		//fw = new FileWriter(output, false);
 		PrintWriter pw = new PrintWriter(fw);
 		pw.println("名字\t\t\t\t"+"属性\t\t\t\t"+"值");
 		pw.flush();

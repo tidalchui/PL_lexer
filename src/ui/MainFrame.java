@@ -1,6 +1,7 @@
 package ui;
 
 import lexer.*;
+import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 
 import javax.lang.model.type.ErrorType;
 import javax.swing.*;
@@ -135,7 +136,7 @@ public class MainFrame extends JFrame {
             }
             //¥Ú”°øÿ÷∆Ã®
             console.setText("");
-            console.setText(String.valueOf(ErrorWriter.errorList.size())+"error(s)"+"\n");
+            console.setText(String.valueOf(ErrorWriter.errorList.size())+" error(s)"+"\n");
             if (!ErrorWriter.errorList.isEmpty()){
                 for (int i=0; i<ErrorWriter.errorList.size(); i++){
                     console.append(ErrorWriter.getErrorString(i)+"\n");

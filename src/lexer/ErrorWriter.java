@@ -28,7 +28,7 @@ public class ErrorWriter {
 			return "参数越界";
 		else {
 			ErrorType eType = errorList.get(i);
-			return eType.type+" line:"+eType.line+" key:"+eType.key;
+			return "line:"+eType.line+ " "+eType.type+" key:"+eType.key;
 		}
 	}
 
